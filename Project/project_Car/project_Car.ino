@@ -1,6 +1,6 @@
 #include <Servo.h>
 #include <IRremote.h> // thư viện hỗ trợ IR remote
-const int receiverPin = 5; // chân digital 8 dùng để đọc tín hiệu
+const int receiverPin = 5; // chân digital 5 dùng để đọc tín hiệu
 IRrecv irrecv(receiverPin); // tạo đối tượng IRrecv mới
 decode_results results;// lưu giữ kết quả giải mã tín hiệu
 #define trigPin 7
@@ -45,6 +45,8 @@ void lui() {
   digitalWrite(in2, LOW);
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
+  delay(500);
+  dung();
 
 }
 void dung() {
@@ -60,7 +62,7 @@ void re_trai() {
   digitalWrite(in2, LOW);
   digitalWrite(in3, LOW);
   digitalWrite(in4, HIGH);
-  delay(1000);
+  delay(400);
   dung();
 
 }
@@ -70,7 +72,7 @@ void re_phai() {
   digitalWrite(in2, HIGH);
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
-  delay(1000);
+  delay(400);
   dung();
 }
 
@@ -104,32 +106,19 @@ void translateIR()
   switch (results.value)
   {
     case 4294967295:
-      digitalWrite(in1, LOW);
-      digitalWrite(in2, HIGH);
-      digitalWrite(in3, LOW);
-      digitalWrite(in4, HIGH);
+      tien();
       break;
-    case 16748655: digitalWrite(in1, LOW);
-      digitalWrite(in2, HIGH);
-      digitalWrite(in3, HIGH);
-      digitalWrite(in4, LOW);
+    case 16748655:
+      re_phai();
       break;
-    case 16750695: digitalWrite(in1, HIGH);
-      digitalWrite(in2, LOW);
-      digitalWrite(in3, HIGH);
-      digitalWrite(in4, LOW);
-
+    case 16750695: 
+      lui();
       break;
-    case 16769055: digitalWrite(in1, HIGH);
-      digitalWrite(in2, LOW);
-      digitalWrite(in3, LOW);
-      digitalWrite(in4, HIGH);
+    case 16769055: 
+      re_trai();
       break;
     case 16754775:
-      digitalWrite(in1, LOW);
-      digitalWrite(in2, LOW);
-      digitalWrite(in3, LOW);
-      digitalWrite(in4, LOW);
+      dung();
       break;
     case 16720605:
       Auto_Drive_Mode();
@@ -144,28 +133,31 @@ void Auto_Drive_Mode() {
   while (stops = true) {
     servo_rotate_front();
     distance_front = cal_Distance();
+    delay(1000);
     Serial.print("Khoang Cach truoc mat: ");
     Serial.print(distance_front);
     Serial.println(" cm");
     delay(1000);
+    
     servo_rotate_right();
     distance_right = cal_Distance();
+    delay(1000);
     Serial.print("Khoang Cach phai: ");
     Serial.print(distance_right);
     Serial.println(" cm");
     delay(1000);
+    
     servo_rotate_left();
     distance_left = cal_Distance();
+    delay(1000);
     Serial.print("Khoang Cach trai: ");
     Serial.print(distance_left);
     Serial.println(" cm");
-    if (distance_front <= 5 ) {
+    if (distance_front <= 7 ) {
       if (distance_right <= 7) {
         if (distance_left <= 7) {
           lui();
           Serial.println("lui");
-          delay(1000);
-          dung();
         } else {
           Serial.println("re trai");
           re_trai();
@@ -177,7 +169,7 @@ void Auto_Drive_Mode() {
     } else {
       Serial.println("Tien");
       tien();
-      delay(1000);
+      delay(500);
       dung();
     }
     delay(2000);
@@ -185,6 +177,7 @@ void Auto_Drive_Mode() {
     if (irrecv.decode(&results)) // nếu nhận được tín hiệu
     {
       if (results.value == 16754775){
+        servo_rotate_front();
       break;
       }
       Serial.println(results.value, DEC);
@@ -198,7 +191,7 @@ void Auto_Drive_Mode() {
 
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  servo_rotate_front();
   if (irrecv.decode(&results)) // nếu nhận được tín hiệu
   {
     translateIR();

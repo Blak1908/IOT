@@ -118,6 +118,20 @@ void translateIR() {
       break;
   }
 }
+boolean isRightCanMove(int right, int left){
+  if (right > left) {
+    return true;
+  } 
+  return false;
+}
+
+void make_decision(int right, int left){
+  if (isRightCanMove(right, left)) {
+    re_phai();
+  } else {
+    re_trai();
+  }
+}
 
 void Auto_Drive_Mode() {
   boolean stops = false;
@@ -143,16 +157,16 @@ void Auto_Drive_Mode() {
       Serial.print(distance_left);
       Serial.println(" cm");
 
-      if (distance_right >= 7 && distance_right > distance_left) {
+      if (distance_right >= 10) {
         re_phai();
         delay(500);
-      } else if (distance_left >= 7) {
+      } else if (distance_left >= 10) {
         re_trai();
         delay(500);
       } else {
         lui();
         lui();
-        re_phai();
+        make_decision(distance_right, distance_left);
         delay(500);
       }
     }

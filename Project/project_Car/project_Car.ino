@@ -14,11 +14,9 @@ int distance_front;
 int distance_left;
 int distance_right;
 Servo myservo;
-int enB = 2;
-int enA = 3;
 
-int motorSpeedA = 10;
-int motorSpeedB = 10;
+int motorSpeedA = 50;
+int motorSpeedB = 50;
 int pos = 0;
 void setup() {
   // put your setup code here, to run once:
@@ -31,8 +29,7 @@ void setup() {
   pinMode(in2, OUTPUT);
   pinMode(in3, OUTPUT);
   pinMode(in4, OUTPUT);
-  pinMode(enA, OUTPUT);
-  pinMode(enB, OUTPUT);
+
 }
 
 void tien() {
@@ -131,8 +128,6 @@ void Auto_Drive_Mode() {
     Serial.print(distance_front);
     Serial.println(" cm");
     if (distance_front >= 10) {
-      analogWrite(enA, motorSpeedA);  // Send PWM signal to motor A
-      analogWrite(enB, motorSpeedB);  // Send PWM signal to motor B
       tien();
     } else {
       dung();
@@ -156,6 +151,8 @@ void Auto_Drive_Mode() {
         delay(500);
       } else {
         lui();
+        lui();
+        re_phai();
         delay(500);
       }
     }

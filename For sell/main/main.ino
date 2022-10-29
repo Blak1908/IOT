@@ -1,6 +1,3 @@
-// Khai báo thư viện cho servo 
-#include <Servo.h>
-Servo myservo;
 //khai báo dữ liệu cho cảm biến
 #define trigPin 7
 #define echoPin 8
@@ -16,18 +13,15 @@ int motorSpeedA = 128;  // set tốc độ xung mặc định cho module
 int motorSpeedB = 128;
 //Các biến đo khoảng cách phía trước, bên trái, bên phải
 float distance_front;
-float distance_left;
-float distance_right;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  pinMode(trigPin, OUTPUT); // Trig sensor
-  pinMode(echoPin, INPUT); // Echo sensor
-  myservo.attach(6);
-  pinMode(enA, OUTPUT); // Output chân enA
-  pinMode(enB, OUTPUT); // Output chân enB
-  // setup chân điều khiển bánh xe 2 bên trái phải 
+  pinMode(trigPin, OUTPUT);  // Trig sensor
+  pinMode(echoPin, INPUT);   // Echo sensor
+  pinMode(enA, OUTPUT);  // Output chân enA
+  pinMode(enB, OUTPUT);  // Output chân enB
+  // setup chân điều khiển bánh xe 2 bên trái phải
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);
   pinMode(in3, OUTPUT);
@@ -41,7 +35,7 @@ void tien() {
   digitalWrite(in2, HIGH);
   analogWrite(in3, LOW);
   digitalWrite(in4, HIGH);
-  delay(300); // giới hạn thời gian cho xe đi thẳng 
+  delay(300);  // giới hạn thời gian cho xe đi thẳng
   dung();
 }
 
@@ -52,7 +46,7 @@ void lui() {
   digitalWrite(in2, LOW);
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
-  delay(300);// giới hạn thời gian cho xe đi lùi 
+  delay(300);  // giới hạn thời gian cho xe đi lùi
   dung();
 }
 
@@ -87,21 +81,6 @@ void re_phai() {
   dung();
 }
 
-// Servo quay phải
-void servo_rotate_right() {
-  myservo.write(0);
-}
-
-// Servo quay trái
-void servo_rotate_left() {
-  myservo.write(180);
-}
-
-// Servo quay về phía trước 
-void servo_rotate_front() {
-  myservo.write(90);
-}
-
 
 // Tính khoảng cách với dữ liệu thu được từ cảm biến
 float cal_Distance() {
@@ -116,50 +95,39 @@ float cal_Distance() {
   return distance;
 }
 
+void tien_co_kiem_soat_phai() {
+    Serial.println("tien");
+    analogWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    analogWrite(in3, LOW);
+    digitalWrite(in4, HIGH);
+  while (true) {
+    distance_front = cal_Distance();
+    if (distance_front <= 10){
+      dung();
+      delay(500);
+      re_phai();
+    }   
+  }
+}
+void tien_co_kiem_soat_trai() {
+    Serial.println("tien");
+    analogWrite(in1, LOW);
+    digitalWrite(in2, HIGH);
+    analogWrite(in3, LOW);
+    digitalWrite(in4, HIGH);
+  while (true) {
+    distance_front = cal_Distance();
+    if (distance_front <= 10){
+      dung();
+      delay(500);
+      re_trai();
+    }   
+  }
+}
 
 // Chức năng xe tự động dò đường và tránh vật cản
 void Auto_Drive_Mode() {
-  //Đo khoảng cách phía trước
-  servo_rotate_front();
-  distance_front = cal_Distance();
-  Serial.print("Khoang Cach truoc mat: ");
-  Serial.print(distance_front);
-  Serial.println(" cm");
-
-  if (distance_front >= 15) {
-    // Khi phía trước không có vật cản
-    tien();
-    delay(500);
-  } else {
-    // Phía trước có vật cản
-    dung();
-    servo_rotate_right();
-    distance_right = cal_Distance();  // Đo khoảng cách bên phải
-    Serial.print("Khoang Cach phai: ");
-    Serial.print(distance_right);
-    Serial.println(" cm");
-    delay(500);
-
-    servo_rotate_left();
-    distance_left = cal_Distance();  // Đo khoảng cách bên trái
-    Serial.print("Khoang Cach trai: ");
-    Serial.print(distance_left);
-    Serial.println(" cm");
-
-    if (distance_right >= 10) {
-      // Trường hợp bên phải không có vật cản
-      re_phai();
-      delay(500);
-    } else if (distance_left >= 10) {
-      // Bên trái không có vật cản
-      re_trai();
-      delay(500);
-    } else {
-      // Bên phải, bên trái và phía trước đều có vật cản
-      lui();
-      dung();
-    }
-  }
 }
 void loop() {
   // put your main code here, to run repeatedly:
@@ -170,7 +138,7 @@ void loop() {
   if (motorSpeedB < 128) {
     motorSpeedB = 0;
   }
-    if (motorSpeedA > 225) {
+  if (motorSpeedA > 225) {
     motorSpeedA = 225;
   }
   if (motorSpeedB > 225) {
@@ -178,5 +146,12 @@ void loop() {
   }
   analogWrite(enA, motorSpeedA);
   analogWrite(enB, motorSpeedB);
-  Auto_Drive_Mode();
+  tien_co_kiem_soat_phai();
+  tien_co_kiem_soat_trai();
+  tien();
+  tien();
+  re_phai();
+  tien_co_kiem_soat_trai();
+  tien();
+  tien();
 }

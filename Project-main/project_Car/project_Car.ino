@@ -136,40 +136,47 @@ void make_decision(int right, int left){
 void Auto_Drive_Mode() {
   boolean stops = false;
   while (stops = true) {
-    servo_rotate_front();
-    distance_front = cal_Distance();
-    Serial.print("Khoang Cach truoc mat: ");
-    Serial.print(distance_front);
-    Serial.println(" cm");
-    if (distance_front >= 10) {
-      tien();
-    } else {
-      dung();
-      servo_rotate_right();
-      distance_right = cal_Distance();
-      Serial.print("Khoang Cach phai: ");
-      Serial.print(distance_right);
-      Serial.println(" cm");
-      delay(500);
-      servo_rotate_left();
-      distance_left = cal_Distance();
-      Serial.print("Khoang Cach trai: ");
-      Serial.print(distance_left);
-      Serial.println(" cm");
+    //Đo khoảng cách phía trước
+  servo_rotate_front();
+  distance_front = cal_Distance();
+  Serial.print("Khoang Cach truoc mat: ");
+  Serial.print(distance_front);
+  Serial.println(" cm");
 
-      if (distance_right >= 10) {
-        re_phai();
-        delay(500);
-      } else if (distance_left >= 10) {
-        re_trai();
-        delay(500);
-      } else {
-        lui();
-        lui();
-        make_decision(distance_right, distance_left);
-        delay(500);
-      }
+  if (distance_front >= 15) {
+    // Khi phía trước không có vật cản
+    tien();
+    delay(500);
+  } else {
+    // Phía trước có vật cản
+    dung();
+    servo_rotate_right();
+    distance_right = cal_Distance();  // Đo khoảng cách bên phải
+    Serial.print("Khoang Cach phai: ");
+    Serial.print(distance_right);
+    Serial.println(" cm");
+    delay(500);
+
+    servo_rotate_left();
+    distance_left = cal_Distance();  // Đo khoảng cách bên trái
+    Serial.print("Khoang Cach trai: ");
+    Serial.print(distance_left);
+    Serial.println(" cm");
+
+    if (distance_right >= 10) {
+      // Trường hợp bên phải không có vật cản
+      re_phai();
+      delay(500);
+    } else if (distance_left >= 10) {
+      // Bên trái không có vật cản
+      re_trai();
+      delay(500);
+    } else {
+      // Bên phải, bên trái và phía trước đều có vật cản
+      lui();
+      dung();
     }
+  }
 
     if (irrecv.decode(&results))  // nếu nhận được tín hiệu
     {

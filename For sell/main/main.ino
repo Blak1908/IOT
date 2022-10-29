@@ -1,68 +1,73 @@
+// Khai báo thư viện cho servo 
 #include <Servo.h>
 Servo myservo;
-//khai báo dữ liệu cho cảm biến 
-#define trigPin 7 
+//khai báo dữ liệu cho cảm biến
+#define trigPin 7
 #define echoPin 8
 
 // khai báo các chân kết nổi với module L289n
-#define enA 4 
-#define enB 5
+#define enA 3
+#define enB 4
 int in1 = 9;
 int in2 = 10;
 int in3 = 11;
 int in4 = 12;
-int pwmOutput = 50; // set tốc độ xung mặc định cho module
-
+int motorSpeedA = 128;  // set tốc độ xung mặc định cho module
+int motorSpeedB = 128;
 //Các biến đo khoảng cách phía trước, bên trái, bên phải
 float distance_front;
 float distance_left;
 float distance_right;
 
-
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
+  pinMode(trigPin, OUTPUT); // Trig sensor
+  pinMode(echoPin, INPUT); // Echo sensor
   myservo.attach(6);
+  pinMode(enA, OUTPUT); // Output chân enA
+  pinMode(enB, OUTPUT); // Output chân enB
+  // setup chân điều khiển bánh xe 2 bên trái phải 
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);
   pinMode(in3, OUTPUT);
   pinMode(in4, OUTPUT);
 }
 
-
+// Chức năng cho xe đi thẳng
 void tien() {
-  analogWrite(enA, pwmOutput);
-  analogWrite(enA, pwmOutput);
+  Serial.println("tien");
   analogWrite(in1, LOW);
   digitalWrite(in2, HIGH);
   analogWrite(in3, LOW);
   digitalWrite(in4, HIGH);
+  delay(300); // giới hạn thời gian cho xe đi thẳng 
+  dung();
 }
+
+// Chức năng cho xe đi lùi
 void lui() {
-  analogWrite(enA, pwmOutput);
-  analogWrite(enA, pwmOutput);
+  Serial.println("lui");
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
-  delay(500);
+  delay(300);// giới hạn thời gian cho xe đi lùi 
   dung();
 }
+
+// Chức năng cho xe dừng lại
 void dung() {
-  analogWrite(enA, pwmOutput);
-  analogWrite(enA, pwmOutput);
+  Serial.println("dung");
   digitalWrite(in1, LOW);
   digitalWrite(in2, LOW);
   digitalWrite(in3, LOW);
   digitalWrite(in4, LOW);
 }
 
+// Chức năng cho xe rẽ trái
 void re_trai() {
-  analogWrite(enA, pwmOutput);
-  analogWrite(enA, pwmOutput);
+  Serial.println("re trai");
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);
   digitalWrite(in3, LOW);
@@ -71,9 +76,9 @@ void re_trai() {
   dung();
 }
 
+// Chức năng cho xe rẽ phải
 void re_phai() {
-  analogWrite(enA, pwmOutput);
-  analogWrite(enA, pwmOutput);
+  Serial.println("re phai");
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
   digitalWrite(in3, HIGH);
@@ -81,21 +86,25 @@ void re_phai() {
   delay(400);
   dung();
 }
+
+// Servo quay phải
 void servo_rotate_right() {
   myservo.write(0);
 }
 
+// Servo quay trái
 void servo_rotate_left() {
   myservo.write(180);
 }
 
+// Servo quay về phía trước 
 void servo_rotate_front() {
   myservo.write(90);
 }
 
 
+// Tính khoảng cách với dữ liệu thu được từ cảm biến
 float cal_Distance() {
-  // tính khoảng cách với dữ liệu thu được từ cảm biến 
   long duration, distance;
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
@@ -107,78 +116,67 @@ float cal_Distance() {
   return distance;
 }
 
-boolean isRightCanMove(int right, int left) {
-  if (right > left) {
-    return true;
-  }
-  return false;
-}
 
-
-void make_decision(int right, int left) {
-  if (isRightCanMove(right, left)) {
-    re_phai();
-  } else {
-    re_trai();
-  }
-}
-
+// Chức năng xe tự động dò đường và tránh vật cản
 void Auto_Drive_Mode() {
+  //Đo khoảng cách phía trước
   servo_rotate_front();
   distance_front = cal_Distance();
   Serial.print("Khoang Cach truoc mat: ");
   Serial.print(distance_front);
   Serial.println(" cm");
 
-  if (distance_front >= 7) {
-    // khi phía trước không có vật cản 
+  if (distance_front >= 15) {
+    // Khi phía trước không có vật cản
     tien();
+    delay(500);
   } else {
-    // phía trước có vật cản 
+    // Phía trước có vật cản
     dung();
     servo_rotate_right();
-    distance_right = cal_Distance();  // đo khoảng cách bên phải 
+    distance_right = cal_Distance();  // Đo khoảng cách bên phải
     Serial.print("Khoang Cach phai: ");
     Serial.print(distance_right);
     Serial.println(" cm");
     delay(500);
 
     servo_rotate_left();
-    distance_left = cal_Distance();  // đo khoảng cách bên trái
+    distance_left = cal_Distance();  // Đo khoảng cách bên trái
     Serial.print("Khoang Cach trai: ");
     Serial.print(distance_left);
     Serial.println(" cm");
 
     if (distance_right >= 10) {
-      // Trường hợp bên phải không có vật cản 
+      // Trường hợp bên phải không có vật cản
       re_phai();
       delay(500);
     } else if (distance_left >= 10) {
-      // Bên trái không có vật cản 
+      // Bên trái không có vật cản
       re_trai();
       delay(500);
     } else {
-      // Bên phải, bên trái và phía trước đều có vật cản 
+      // Bên phải, bên trái và phía trước đều có vật cản
       lui();
       dung();
-      servo_rotate_right();
-      distance_right = cal_Distance();  // đo khoảng cách bên phải 
-      Serial.print("Khoang Cach phai: ");
-      Serial.print(distance_right);
-      Serial.println(" cm");
-      delay(500);
-
-      servo_rotate_left();
-      distance_left = cal_Distance();  // đo khoảng cách bên trái
-      Serial.print("Khoang Cach trai: ");
-      Serial.print(distance_left);
-      Serial.println(" cm");
-      // Đưa ra quyết định rẻ trái hay phải
-      make_decision(distance_right, distance_left);
-      delay(500);
     }
   }
 }
 void loop() {
   // put your main code here, to run repeatedly:
+  // Giới hạn xung truyền đến cho L289n từ 128 - 225 (Điều chính tốc độ của bánh xe)
+  if (motorSpeedA < 128) {
+    motorSpeedA = 0;
+  }
+  if (motorSpeedB < 128) {
+    motorSpeedB = 0;
+  }
+    if (motorSpeedA > 225) {
+    motorSpeedA = 225;
+  }
+  if (motorSpeedB > 225) {
+    motorSpeedB = 225;
+  }
+  analogWrite(enA, motorSpeedA);
+  analogWrite(enB, motorSpeedB);
+  Auto_Drive_Mode();
 }

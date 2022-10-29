@@ -9,9 +9,10 @@ int in1 = 9;
 int in2 = 10;
 int in3 = 11;
 int in4 = 12;
-int motorSpeedA = 128;  // set tốc độ xung mặc định cho module
-int motorSpeedB = 128;
-//Các biến đo khoảng cách phía trước, bên trái, bên phải
+int motorSpeedA = 225;  // set tốc độ xung mặc định cho chân enA
+int motorSpeedB = 225; // set tốc độ xung mặc định cho chân enB
+
+//Biến đo khoảng cách phía trước
 float distance_front;
 
 void setup() {
@@ -19,8 +20,8 @@ void setup() {
   Serial.begin(9600);
   pinMode(trigPin, OUTPUT);  // Trig sensor
   pinMode(echoPin, INPUT);   // Echo sensor
-  pinMode(enA, OUTPUT);  // Output chân enA
-  pinMode(enB, OUTPUT);  // Output chân enB
+  pinMode(enA, OUTPUT);      // Output chân enA
+  pinMode(enB, OUTPUT);      // Output chân enB
   // setup chân điều khiển bánh xe 2 bên trái phải
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);
@@ -66,7 +67,7 @@ void re_trai() {
   digitalWrite(in2, LOW);
   digitalWrite(in3, LOW);
   digitalWrite(in4, HIGH);
-  delay(400);
+  delay(450);
   dung();
 }
 
@@ -77,7 +78,7 @@ void re_phai() {
   digitalWrite(in2, HIGH);
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
-  delay(400);
+  delay(450);
   dung();
 }
 
@@ -95,63 +96,68 @@ float cal_Distance() {
   return distance;
 }
 
+// Tiến về phía trước và chỉ rẻ phải khi có vật cản
 void tien_co_kiem_soat_phai() {
-    Serial.println("tien");
-    analogWrite(in1, LOW);
-    digitalWrite(in2, HIGH);
-    analogWrite(in3, LOW);
-    digitalWrite(in4, HIGH);
   while (true) {
+    Serial.println("tien");
+    tien();
+    delay(300);
     distance_front = cal_Distance();
-    if (distance_front <= 10){
+    if (distance_front <= 10) {
       dung();
       delay(500);
       re_phai();
-    }   
-  }
-}
-void tien_co_kiem_soat_trai() {
-    Serial.println("tien");
-    analogWrite(in1, LOW);
-    digitalWrite(in2, HIGH);
-    analogWrite(in3, LOW);
-    digitalWrite(in4, HIGH);
-  while (true) {
-    distance_front = cal_Distance();
-    if (distance_front <= 10){
-      dung();
-      delay(500);
-      re_trai();
-    }   
+      break;
+    }
   }
 }
 
-// Chức năng xe tự động dò đường và tránh vật cản
+// Tiến về phía trước và chỉ rẻ trái khi có vật cản
+void tien_co_kiem_soat_trai() {
+  while (true) {
+    Serial.println("tien");
+    tien();
+    delay(300);
+    distance_front = cal_Distance();
+    if (distance_front <= 10) {
+      dung();
+      delay(500);
+      re_trai();
+      break;
+    }
+  }
+}
+
+// Chức năng cho xe đi theo quỹ đạo cho sẵn theo map 
 void Auto_Drive_Mode() {
+  
+  // Nhấn nút reset trên arduino UNO R3 để reset quá trình chạy theo quỹ đạo tại điểm bắt đầu
+  
+  analogWrite(enA, motorSpeedA); // set tốc độ cho chân enA
+  analogWrite(enB, motorSpeedB); // set tốc độ cho chân enB
+  // Lộ trình bắt đầu
+  tien_co_kiem_soat_phai();
+  delay(300);
+  tien_co_kiem_soat_trai();
+  delay(300);
+  tien();
+  delay(300);
+  tien();
+  delay(300);
+  re_phai();
+  delay(300);
+  tien_co_kiem_soat_trai();
+  delay(300);
+  tien();
+  delay(300);
+  tien();
+  delay(300);
+  tien();
+  delay(300);
+  dung();
+  delay(50000);
 }
 void loop() {
   // put your main code here, to run repeatedly:
-  // Giới hạn xung truyền đến cho L289n từ 128 - 225 (Điều chính tốc độ của bánh xe)
-  if (motorSpeedA < 128) {
-    motorSpeedA = 0;
-  }
-  if (motorSpeedB < 128) {
-    motorSpeedB = 0;
-  }
-  if (motorSpeedA > 225) {
-    motorSpeedA = 225;
-  }
-  if (motorSpeedB > 225) {
-    motorSpeedB = 225;
-  }
-  analogWrite(enA, motorSpeedA);
-  analogWrite(enB, motorSpeedB);
-  tien_co_kiem_soat_phai();
-  tien_co_kiem_soat_trai();
-  tien();
-  tien();
-  re_phai();
-  tien_co_kiem_soat_trai();
-  tien();
-  tien();
+  Auto_Drive_Mode();
 }

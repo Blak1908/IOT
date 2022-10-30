@@ -9,8 +9,9 @@ int in1 = 9;
 int in2 = 10;
 int in3 = 11;
 int in4 = 12;
-int motorSpeedA = 225;  // set tốc độ xung mặc định cho chân enA
-int motorSpeedB = 225; // set tốc độ xung mặc định cho chân enB
+int motorSpeedA = 128;  // set tốc độ xung mặc định cho chân enA
+int motorSpeedB = 128; // set tốc độ xung mặc định cho chân enB
+
 
 //Biến đo khoảng cách phía trước
 float distance_front;
@@ -122,42 +123,90 @@ void tien_co_kiem_soat_trai() {
     if (distance_front <= 10) {
       dung();
       delay(500);
-      re_trai();
+      digitalWrite(in1, HIGH);
+      digitalWrite(in2, LOW);
+      digitalWrite(in3, LOW);
+      digitalWrite(in4, HIGH);
+      delay(400);
       break;
     }
   }
 }
 
-// Chức năng cho xe đi theo quỹ đạo cho sẵn theo map 
-void Auto_Drive_Mode() {
-  
+// Chức năng cho xe đi theo quỹ đạo tọa độ (10,10) đến (110,110)
+void Auto_Drive_Mode1() {
+
   // Nhấn nút reset trên arduino UNO R3 để reset quá trình chạy theo quỹ đạo tại điểm bắt đầu
-  
+
+  analogWrite(enA, motorSpeedA); // set tốc độ cho chân enA
+  analogWrite(enB, motorSpeedB); // set tốc độ cho chân enB
+  // Lộ trình bắt đầu
+  // Xe quay phải 45 độ để bắt đầu lộ trình
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, HIGH);
+  delay(400);
+  dung();
+  tien_co_kiem_soat_trai();
+  delay(300);
+  tien();
+  tien();
+  tien();
+  re_phai();
+  tien_co_kiem_soat_trai();
+  tien();
+  dung();
+  delay(50000);
+}
+
+// Chức năng cho xe đi theo quỹ đạo tọa độ (10,10) đến (10,110)
+void Auto_Drive_Mode2() {
+
+  // Nhấn nút reset trên arduino UNO R3 để reset quá trình chạy theo quỹ đạo tại điểm bắt đầu
+
   analogWrite(enA, motorSpeedA); // set tốc độ cho chân enA
   analogWrite(enB, motorSpeedB); // set tốc độ cho chân enB
   // Lộ trình bắt đầu
   tien_co_kiem_soat_phai();
-  delay(300);
+  delay(400);
+  tien();
+  re_trai();
   tien_co_kiem_soat_trai();
-  delay(300);
   tien();
-  delay(300);
-  tien();
-  delay(300);
-  re_phai();
-  delay(300);
-  tien_co_kiem_soat_trai();
-  delay(300);
-  tien();
-  delay(300);
-  tien();
-  delay(300);
-  tien();
-  delay(300);
   dung();
   delay(50000);
 }
+
+// Chức năng cho xe đi theo quỹ đạo tọa độ (10,10) đến (110,10)
+void Auto_Drive_Mode3() {
+
+  // Nhấn nút reset trên arduino UNO R3 để reset quá trình chạy theo quỹ đạo tại điểm bắt đầu
+
+  analogWrite(enA, motorSpeedA); // set tốc độ cho chân enA
+  analogWrite(enB, motorSpeedB); // set tốc độ cho chân enB
+  // Lộ trình bắt đầu
+  re_phai();
+  tien_co_kiem_soat_trai();
+  delay(400);
+  tien();
+  tien();
+  tien();
+  tien();
+  re_phai();
+  tien();
+  tien();
+  tien();
+  tien_co_kiem_soat_trai();
+  dung();
+  delay(50000);
+}
+
+
+
+
 void loop() {
+  // Nhấn nút reset trên arduino UNO R3 để reset quá trình chạy theo quỹ đạo tại điểm bắt đầu
   // put your main code here, to run repeatedly:
-  Auto_Drive_Mode();
+  Auto_Drive_Mode1();
 }

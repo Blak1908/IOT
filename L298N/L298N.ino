@@ -2,6 +2,7 @@ int in1=9;
 int in2=10;
 int in3=11;
 int in4=12;
+
 void setup() {
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);

@@ -4,7 +4,8 @@
 #define encodPinB1      8                             // Quadrature encoder B pin
 #define M1              9                             // PWM outputs to L298N H-Bridge motor driver module
 #define M2              10
-double kp = 5.0; double ki = 1.0; double kd = 0.01 ; double input = 0, output = 0, setpoint = 0;   // modify kp, ki and kd for optimal performance
+double kp = 5;
+float ki = 1, kd =   0.01, input =0, output= 0, setpoint =0;
 long temp;
 volatile long encoderPos = 0;
 PID myPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);  // if motor will only run at full speed try 'REVERSE' instead of 'DIRECT'

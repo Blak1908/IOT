@@ -4,13 +4,24 @@
 #define encodPinB1      8                             // Quadrature encoder B pin
 #define M1              9                             // PWM outputs to L298N H-Bridge motor driver module
 #define M2              10
-double kp = 5;
-float ki = 1, kd =   0.01, input =0, output= 0, setpoint =0;
+#define M3             11                            // PWM outputs to L298N H-Bridge motor driver module
+#define M4              12
+
+double kP = 0.5, kI = 0.001, kD = 0;
 long temp;
 volatile long encoderPos = 0;
+double error = 0;
+
+double P = 0, I = 0, D = 0;
+double PID;
+double setPoint = 90;
+int controlPwm;
+long lastProcess = 0;
+
 PID myPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);  // if motor will only run at full speed try 'REVERSE' instead of 'DIRECT'
 
 void setup() {
+  pinMode(M1, OUTPUT); 
   pinMode(encodPinA1, INPUT_PULLUP);                  // quadrature encoder input A
   pinMode(encodPinB1, INPUT_PULLUP);                  // quadrature encoder input B
   attachInterrupt(0, encoder, FALLING);               // update encoder position
@@ -18,9 +29,11 @@ void setup() {
   myPID.SetMode(AUTOMATIC);
   myPID.SetSampleTime(1);
   myPID.SetOutputLimits(-255, 255);
+  Serial.begin(9600);
 }
 void loop() {
-  temp += analogRead(0);                              // increment position target with potentiometer value (speed), potmeter connected to A0
+  temp = analogRead(0);
+  Serial.print(temp);                            // increment position target with potentiometer value (speed), potmeter connected to A0
   if (temp < 0) {                                     // in case of overflow
     encoderPos = 0;
     temp = 0;

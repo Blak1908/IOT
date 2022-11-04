@@ -6,6 +6,11 @@
 #define M2 10
 #define M3 11  // PWM outputs to L298N H-Bridge motor driver module
 #define M4 12
+#define enA 3
+#define enB 4
+
+int motorSpeedA;  // set tốc độ xung mặc định cho chân enA
+int motorSpeedB; // set tốc độ xung mặc định cho chân enB
 
 double Setpoint, Input, Output;
 double pwm = 0;
@@ -30,16 +35,20 @@ void loop() {
 
 
 void cal_pwm(int out) {  // to H-Bridge board
+  motorSpeedA = out;
+  motorSpeedB = out;
+  analogWrite(enA, motorSpeedA); // set tốc độ cho chân enA
+  analogWrite(enB, motorSpeedB); // set tốc độ cho chân enB
   if (out > 0) {
-    analogWrite(M1, out);  // drive motor CW
-    analogWrite(M2, 0);
-    analogWrite(M3, out);  // drive motor CW
-    analogWrite(M4, 0);
+    digitalWrite(M1, HIGH);  // drive motor CW
+    digitalWrite(M2, LOW);
+    digitalWrite(M3, HIGH);  // drive motor CW
+    digitalWrite(M4, LOW);
   } else {
-    analogWrite(M1, 0);
-    analogWrite(M2, abs(out));
-    analogWrite(M3, 0);
-    analogWrite(M4, abs(out));  // drive motor CCW
+    digitalWrite(M1, LOW);  // drive motor CW
+    digitalWrite(M2, LOW);
+    digitalWrite(M3, LOW);  // drive motor CW
+    digitalWrite(M4, LOW);
   }
 }
 

@@ -1,6 +1,7 @@
 //https://www.teachmemicro.com/arduino-pid-control-tutorial/
 #include <PID_v1.h>
 #include "PinChangeInt.h"  // Thanks to Brett Beauregard for his nice PID library
+
 #define M1 9               // PWM outputs to L298N H-Bridge motor driver module
 #define M2 10
 #define M3 11  // PWM outputs to L298N H-Bridge motor driver module
@@ -100,10 +101,10 @@ void Auto_Drive_Mode() {
   // Lộ trình bắt đầu
   // Xe quay phải 45 độ để bắt đầu lộ trình
   //re phai
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
+  analogWrite(M1, 0);  
+  analogWrite(M2, pwm);
+  analogWrite(M3, pwm);  
+  analogWrite(M4, 0);
   delay(150);
   dung();
   tien();

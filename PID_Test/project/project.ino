@@ -60,10 +60,14 @@ void Stop(){
 }
 
 void run_forward() {
-  analogWrite(M1, 0);  
-  analogWrite(M2, pwm);
-  analogWrite(M3, 0);  
-  analogWrite(M4, pwm);
+  motorSpeedA = 85;
+  motorSpeedB = 85;
+  analogWrite(enA, motorSpeedA); // set tốc độ cho chân enA
+  analogWrite(enB, motorSpeedB); // set tốc độ cho chân enB
+  analogWrite(M1, LOW);
+  digitalWrite(M2, HIGH);
+  analogWrite(M3, LOW);
+  digitalWrite(M4, HIGH);
 }
 
 void run_back(){

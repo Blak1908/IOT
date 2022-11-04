@@ -13,7 +13,7 @@ int motorSpeedA;  // set tốc độ xung mặc định cho chân enA
 int motorSpeedB; // set tốc độ xung mặc định cho chân enB
 
 double Setpoint, Input, Output;
-double pwm = 0;
+double pwm = 85;
 //Specify the links and initial tuning parameters
 double Kp = 2, Ki = 5, Kd = 1;
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
@@ -29,7 +29,7 @@ void loop() {
   Input = analogRead(A0);
   Serial.println(Input);
   myPID.Compute();
-  cal_pwm(Output);
+  run_forward();
 }
 
 
